@@ -52,7 +52,7 @@ public class accounts
                                 u.lastName = reader.GetString(2);
                             
                             
-                                u.balance = reader.Get(3);
+                                u.balance = reader.GetDecimal(3);
                       
                                 u.fullName = u.fisrtName + " " + u.lastName;
                             users.Add(u);
