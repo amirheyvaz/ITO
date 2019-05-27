@@ -8,16 +8,7 @@ using System.Web;
 /// </summary>
 public class user
 {
-    public user(Guid id , string firstName , string lastName , string email , int phoneNumber , Decimal balance)
-    {
-        this.id = id;
-        this.fisrtName = firstName;
-        this.lastName = lastName;
-        fullName = fisrtName + " " +lastName;
-        this.Email = email;
-        this.phoneNumber = phoneNumber;
-        this.balance = balance;
-    }
+ 
     public user(string first , string last)
     {
         id = new Guid();
@@ -33,4 +24,6 @@ public class user
     public int phoneNumber;
     public string fullName;
     public Decimal balance;
+    public Decimal initHolding;
+    public int createdYear;
 }

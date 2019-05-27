@@ -1,4 +1,4 @@
-﻿var people = [], popupNotification, categories, series;
+﻿var people = [], popupNotification, categories = [], series = [];
 $(document).ready(function () {
     getPeople();
     buildWindows();
@@ -24,7 +24,6 @@ function getPeople(){
         dataType: "json",
         success: function (response) {
             people = response.d;
-            debugger;
             buildMultiSelect();
         },
         error: function () {
@@ -39,24 +38,48 @@ function makeChanges() {
     var listBox = $("#selected").data("kendoListBox");
     // selects first list box item
     var data = listBox.dataItems();
-    buildReport();
+    debugger;
+    buildReport(fromYear, ToYear, data);
 }
-function createChart() {
+function createChart(fromYear, ToYear, data) {
+    var from = fromYear, to = ToYear;
+    while (from <= to) {
+        categories.push(from);
+        from++;
+    }
     var chartWidth = document.getElementById("chartContainer").offsetWidth;
-    categories = [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011];
-    series = [{
-        name: "علی",
-        data: [3.907, 7.943, 7.848, 9.284, 9.263, 9.801, 3.890, 8.238, 9.552, 6.855]
-    }, {
-        name: "اکبر",
-        data: [1.988, 2.733, 3.994, 3.464, 4.001, 3.939, 1.333, -2.245, 4.339, 2.727]
-    }, {
-        name: "صادق",
-        data: [4.743, 7.295, 7.175, 6.376, 8.153, 8.535, 5.247, -7.832, 4.3, 4.3]
-    }, {
-        name: "سامان",
-        data: [-0.253, 0.362, -3.519, 1.799, 2.252, 3.343, 0.843, 2.877, -5.416, 5.590]
-    }];
+    var jsonData = JSON.stringify({ users: data, fromYear: fromYear, toYear: ToYear });
+    $.ajax({
+        type: "POST",
+        url: "Report.asmx/getDots",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: jsonData,
+        success: function (response) {
+            series = response.d;
+            CreateKendoChart();
+        },
+        error: function () {
+            alert_kendo("Can't conect to web service", "error");
+        }
+    });
+    //categories = [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011];
+    //series = [{
+    //    name: "علی",
+    //    data: [3.907, 7.943, 7.848, 9.284, 9.263, 9.801, 3.890, 8.238, 9.552, 6.855]
+    //}, {
+    //    name: "اکبر",
+    //    data: [1.988, 2.733, 3.994, 3.464, 4.001, 3.939, 1.333, -2.245, 4.339, 2.727]
+    //}, {
+    //    name: "صادق",
+    //    data: [4.743, 7.295, 7.175, 6.376, 8.153, 8.535, 5.247, -7.832, 4.3, 4.3]
+    //}, {
+    //    name: "سامان",
+    //    data: [-0.253, 0.362, -3.519, 1.799, 2.252, 3.343, 0.843, 2.877, -5.416, 5.590]
+    //}];
+    
+}
+function CreateKendoChart() {
     $("#chart").kendoChart({
         title: {
             text: "نمودار تغییرات حساب افراد"
@@ -99,12 +122,11 @@ function createChart() {
         }
     });
 }
-
-function buildReport() {
+function buildReport(fromYear, ToYear, data) {
 
     //show
     document.getElementById("reports_div").style.display = "block";
-    createChart();
+    createChart(fromYear, ToYear, data);
 }
 function buildMultiSelect() {
     $("#people_picker").kendoListBox({
@@ -119,6 +141,8 @@ function buildMultiSelect() {
     });
     $("#selected").kendoListBox({
         connectWith: "people_picker",
+        dataTextField: "fullName",
+        dataValueField: "fullName",
         selectable: "multiple"
     });
 }

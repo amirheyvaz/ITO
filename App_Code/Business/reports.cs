@@ -9,7 +9,7 @@ using System.Web;
 /// </summary>
 public class reports
 {
-    private string connection_String = "Provider=SQLOLEDB.1;Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=stocks;Data Source=DESKTOP-RDNCF3L";
+    private string connection_String = "Integrated Security=true;Initial Catalog=stocks;Data Source=DESKTOP-RDNCF3L";
     public reports()
     {
         //
@@ -18,6 +18,7 @@ public class reports
     }
     public List<dot> getDots(List<user> users , int fromYear , int toYear)
     {
+        List<dot> dots = new List<dot>();
         SqlConnection connection;
         SqlDataReader reader;
         string commandText = "";
@@ -25,6 +26,12 @@ public class reports
         connection = new SqlConnection(connection_String);
         foreach (user u in users)
         {
+            int from = fromYear, to = toYear, thisYear = u.createdYear;
+            decimal current = u.initHolding;
+            if (to < u.createdYear)
+            {
+                continue;
+            }
             List<transaction> trans = new List<transaction>();
             #region getting the trans
             commandText = String.Format("SELECT * FROM [dbo].[transactions] where formId = '" + u.id.ToString() +"' or toId = '" +  u.id.ToString() + "' order by year" );
@@ -65,29 +72,83 @@ public class reports
             }
 
             #endregion
-            int from = fromYear , to = toYear , i =0;
-            if(trans[trans.Count - 1].year < from || trans[0].year > to)
+            dot d = new dot();
+            d.user = u;
+            d.name = u.fullName;
+            Dictionary<int, Decimal> dic = new Dictionary<int, decimal>();
+            dic.Add(u.createdYear, u.initHolding);
+            foreach(transaction t in trans)
             {
-                continue;
-            }
-            if(trans[i].year < from)
-            {
-                while (trans[i].year < from)
+                if(t.year > to)
                 {
-                    i++;
+                    break;
                 }
-                
-            }
-            while (from <= to)
-            {
-                if(trans[i].year == from)
+                if(u.id == t.fromId)
                 {
-                     i++;
+                    current -= t.amount;
                 }
-                from++;
+                else if(u.id == t.toId)
+                {
+                    current += t.amount;
+                }
+                dic.Add(t.year, current);
             }
+            if(u.createdYear >= from)
+            {
+                while(from < u.createdYear)
+                {
+                    d.data.Add(0);
+                    from++;
+                }
+                while(from <= to)
+                {
+                    if (dic.ContainsKey(from))
+                    {
+                        d.data.Add(dic[from]);
+                    }
+                    else
+                    {
+                        Decimal value = dic[u.createdYear];
+                        foreach(KeyValuePair<int , Decimal> pair in dic)
+                        {
+                            if(from < pair.Key)
+                            {
+                                break;
+                            }
+                            value = pair.Value;
+                        }
+                        d.data.Add(value);
+                    }
+                    from++;
+                }
+            }
+            else
+            {
+                while (from <= to)
+                {
+                    if (dic.ContainsKey(from))
+                    {
+                        d.data.Add(dic[from]);
+                    }
+                    else
+                    {
+                        Decimal value = dic[u.createdYear];
+                        foreach (KeyValuePair<int, Decimal> pair in dic)
+                        {
+                            if (from < pair.Key)
+                            {
+                                break;
+                            }
+                            value = pair.Value;
+                        }
+                        d.data.Add(value);
+                    }
+                    from++;
+                }
+            }
+            dots.Add(d);
         }
-        return new List<dot>();
+        return dots;
     }
 
 }

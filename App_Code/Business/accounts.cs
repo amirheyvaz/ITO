@@ -53,8 +53,9 @@ public class accounts
                             
                             
                                 u.balance = reader.GetDecimal(3);
-                      
-                                u.fullName = u.fisrtName + " " + u.lastName;
+                            u.initHolding = reader.GetDecimal(4);
+
+                            u.fullName = u.fisrtName + " " + u.lastName;
                             users.Add(u);
                         }
                     }
