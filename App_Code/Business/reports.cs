@@ -19,22 +19,23 @@ public class reports
     public List<dot> getDots(List<user> users , int fromYear , int toYear)
     {
         List<dot> dots = new List<dot>();
-        SqlConnection connection;
-        SqlDataReader reader;
-        string commandText = "";
-        SqlCommand command;
-        connection = new SqlConnection(connection_String);
+       
         foreach (user u in users)
         {
             int from = fromYear, to = toYear, thisYear = u.createdYear;
-            decimal current = u.initHolding;
+            double current = u.initHolding;
             if (to < u.createdYear)
             {
                 continue;
             }
             List<transaction> trans = new List<transaction>();
             #region getting the trans
-            commandText = String.Format("SELECT * FROM [dbo].[transactions] where formId = '" + u.id.ToString() +"' or toId = '" +  u.id.ToString() + "' order by year" );
+            SqlConnection connection;
+            SqlDataReader reader;
+            string commandText = "";
+            SqlCommand command;
+            connection = new SqlConnection(connection_String);
+            commandText = String.Format("SELECT * FROM [dbo].[transactions] where fromId = '" + u.id.ToString() +"' or toId = '" +  u.id.ToString() + "' order by year" );
             command = new SqlCommand();
             try
             {
@@ -51,11 +52,10 @@ public class reports
                             while (reader.Read())
                             {
                                 transaction t = new transaction();
-                                t.id = reader.GetGuid(0);
-                                t.fromId = reader.GetGuid(1);
-                                t.toId = reader.GetGuid(2);
-                                t.year = reader.GetInt32(3);
-                                t.amount = reader.GetDecimal(4);
+                                t.fromId = reader.GetGuid(0);
+                                t.toId = reader.GetGuid(1);
+                                t.year = reader.GetInt32(2);
+                                t.amount = reader.GetDouble(3);
                                 trans.Add(t);
                             }
                         }
@@ -75,7 +75,7 @@ public class reports
             dot d = new dot();
             d.user = u;
             d.name = u.fullName;
-            Dictionary<int, Decimal> dic = new Dictionary<int, decimal>();
+            Dictionary<int, double> dic = new Dictionary<int, double>();
             dic.Add(u.createdYear, u.initHolding);
             foreach(transaction t in trans)
             {
@@ -91,7 +91,14 @@ public class reports
                 {
                     current += t.amount;
                 }
-                dic.Add(t.year, current);
+                if (dic.ContainsKey(t.year))
+                {
+                    dic[t.year] = current;
+                }
+                else
+                {
+                    dic.Add(t.year, current);
+                }
             }
             if(u.createdYear >= from)
             {
@@ -108,8 +115,8 @@ public class reports
                     }
                     else
                     {
-                        Decimal value = dic[u.createdYear];
-                        foreach(KeyValuePair<int , Decimal> pair in dic)
+                        double value = dic[u.createdYear];
+                        foreach(KeyValuePair<int , double> pair in dic)
                         {
                             if(from < pair.Key)
                             {
@@ -132,8 +139,8 @@ public class reports
                     }
                     else
                     {
-                        Decimal value = dic[u.createdYear];
-                        foreach (KeyValuePair<int, Decimal> pair in dic)
+                        double value = dic[u.createdYear];
+                        foreach (KeyValuePair<int, double> pair in dic)
                         {
                             if (from < pair.Key)
                             {

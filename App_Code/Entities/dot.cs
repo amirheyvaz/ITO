@@ -13,9 +13,9 @@ public class dot
         //
         // TODO: Add constructor logic here
         //
-        data = new List<Decimal>();
+        data = new List<double>();
     }
     public string name;
-    public List<Decimal> data;
+    public List<double> data;
     public user user;
 }

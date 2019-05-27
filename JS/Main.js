@@ -38,7 +38,6 @@ function makeChanges() {
     var listBox = $("#selected").data("kendoListBox");
     // selects first list box item
     var data = listBox.dataItems();
-    debugger;
     buildReport(fromYear, ToYear, data);
 }
 function createChart(fromYear, ToYear, data) {
@@ -47,7 +46,6 @@ function createChart(fromYear, ToYear, data) {
         categories.push(from);
         from++;
     }
-    var chartWidth = document.getElementById("chartContainer").offsetWidth;
     var jsonData = JSON.stringify({ users: data, fromYear: fromYear, toYear: ToYear });
     $.ajax({
         type: "POST",
@@ -63,23 +61,10 @@ function createChart(fromYear, ToYear, data) {
             alert_kendo("Can't conect to web service", "error");
         }
     });
-    //categories = [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011];
-    //series = [{
-    //    name: "علی",
-    //    data: [3.907, 7.943, 7.848, 9.284, 9.263, 9.801, 3.890, 8.238, 9.552, 6.855]
-    //}, {
-    //    name: "اکبر",
-    //    data: [1.988, 2.733, 3.994, 3.464, 4.001, 3.939, 1.333, -2.245, 4.339, 2.727]
-    //}, {
-    //    name: "صادق",
-    //    data: [4.743, 7.295, 7.175, 6.376, 8.153, 8.535, 5.247, -7.832, 4.3, 4.3]
-    //}, {
-    //    name: "سامان",
-    //    data: [-0.253, 0.362, -3.519, 1.799, 2.252, 3.343, 0.843, 2.877, -5.416, 5.590]
-    //}];
     
 }
 function CreateKendoChart() {
+    var chartWidth = document.getElementById("chartContainer").offsetWidth;
     $("#chart").kendoChart({
         title: {
             text: "نمودار تغییرات حساب افراد"
@@ -91,7 +76,6 @@ function CreateKendoChart() {
             background: "",
             width: chartWidth
         },
-        zoomable: true,
         seriesDefaults: {
             type: "line",
             style: "smooth"
@@ -99,7 +83,7 @@ function CreateKendoChart() {
         series:series,
         valueAxis: {
             labels: {
-                format: "{0}%"
+                format: "{0}"
             },
             line: {
                 visible: false

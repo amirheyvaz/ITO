@@ -17,6 +17,6 @@ public class transaction
     public Guid fromId;
     public Guid toId;
     public Guid id;
-    public decimal amount;
+    public double amount;
     public int year;
 }

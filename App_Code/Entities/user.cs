@@ -23,7 +23,7 @@ public class user
     public string Email;
     public int phoneNumber;
     public string fullName;
-    public Decimal balance;
-    public Decimal initHolding;
+    public double balance;
+    public double initHolding;
     public int createdYear;
 }

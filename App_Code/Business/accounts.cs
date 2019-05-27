@@ -52,9 +52,9 @@ public class accounts
                                 u.lastName = reader.GetString(2);
                             
                             
-                                u.balance = reader.GetDecimal(3);
-                            u.initHolding = reader.GetDecimal(4);
-
+                                u.balance = reader.GetDouble(3);
+                            u.initHolding = reader.GetDouble(4);
+                            u.createdYear = reader.GetInt32(5);
                             u.fullName = u.fisrtName + " " + u.lastName;
                             users.Add(u);
                         }
